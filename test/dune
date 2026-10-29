@@ -1,0 +1,10 @@
+(test
+ (name test_labyrinth)
+ (modules test_labyrinth)
+ (libraries labyrinth ounit2))
+
+(copy_files ../bin/terminal.ml)
+(executable
+ (name terminal_probe)
+ (modules terminal_probe terminal)
+ (libraries labyrinth unix))
