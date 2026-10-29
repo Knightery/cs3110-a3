@@ -346,8 +346,29 @@ let generator_tests =
       with Invalid_argument _ -> () );
   ]
 
+let contains text part =
+  let n = String.length part in
+  let rec go i =
+    i + n <= String.length text && (String.sub text i n = part || go (i + 1))
+  in
+  go 0
+
 let color_tests =
   [
+    ( "frame shows score, required, turns, seed and controls" >:: fun _ ->
+      let g = fresh () in
+      Game.apply g Game.Right;
+      let frame = Display.render g in
+      List.iter
+        (fun part -> assert_bool part (contains frame part))
+        [
+          "Lambdas: 0/8";
+          "Turns: 1";
+          "Seed: 42";
+          "WASD: move";
+          "q: quit";
+          "Collect 8 points";
+        ] );
     ( "colored frame preserves content and state" >:: fun _ ->
       let g = fresh () in
       let before = snapshot g in

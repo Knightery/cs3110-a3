@@ -4,6 +4,7 @@
  (libraries labyrinth ounit2))
 
 (copy_files ../bin/terminal.ml)
+
 (executable
  (name terminal_probe)
  (modules terminal_probe terminal)

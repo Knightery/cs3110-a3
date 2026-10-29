@@ -38,11 +38,14 @@ let with_mode f =
           output_string stdout "\027[?25l\027[2J");
       f (saved <> None))
 
+(* Lowercase only: arrow and function keys arrive as escape sequences ending
+   in uppercase letters (up = ESC [ A, left = ESC [ D, F2 = ESC O Q), so
+   accepting uppercase would turn those unrecognized keys into moves. *)
 let action = function
-  | 'w' | 'W' -> Some Game.Up
-  | 'a' | 'A' -> Some Game.Left
-  | 's' | 'S' -> Some Game.Down
-  | 'd' | 'D' -> Some Game.Right
+  | 'w' -> Some Game.Up
+  | 'a' -> Some Game.Left
+  | 's' -> Some Game.Down
+  | 'd' -> Some Game.Right
   | '.' -> Some Game.Wait
   | _ -> None
 
@@ -59,7 +62,7 @@ let run game =
         draw ();
         if Game.outcome game = Game.Playing then
           match input_char stdin with
-          | 'q' | 'Q' -> ()
+          | 'q' -> ()
           | key ->
               Option.iter (Game.apply game) (action key);
               loop ()

@@ -31,11 +31,28 @@ val cell_view : t -> World.position -> visible_cell
 (** Actor/outcome precedence, then fog, treasure and terrain. No mutation. *)
 
 val dimensions : t -> int * int
+(** [(rows, cols)] of the underlying world. *)
+
 val camel : t -> World.position
+(** Current camel position. *)
+
 val worm : t -> World.position
+(** Current sandworm position. *)
+
 val revealed : t -> World.position -> bool
+(** Whether the camel has discovered the cell; [false] outside the grid. *)
+
 val score : t -> int
+(** Points collected so far. *)
+
 val required : t -> int
+(** Points needed before entering the exit ends in victory (8). *)
+
 val turns : t -> int
+(** Successful moves and waits so far. *)
+
 val seed : t -> int
+(** Seed recorded at [start], for display. *)
+
 val outcome : t -> outcome
+(** [Playing] until victory or defeat. *)

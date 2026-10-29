@@ -5,6 +5,7 @@ import errno
 import os
 from pathlib import Path
 import pty
+import re
 import select
 import signal
 import subprocess
@@ -70,7 +71,7 @@ def play_and_quit(proc, fd):
     os.write(fd, b'q')
 
 def cli():
-    for value in ['-1', 'abc', '9999999999999999999999999999999']:
+    for value in ['-1', 'abc', '9999999999999999999999999999999', '', '0x2A', '+5', '1_0']:
         result = subprocess.run([str(GAME), value], input=b'q', capture_output=True, timeout=4)
         assert result.returncode == 2
         assert b'nonnegative integer' in result.stderr
@@ -80,6 +81,15 @@ def cli():
         result = subprocess.run([str(GAME), '42'], input=data, capture_output=True, timeout=4)
         assert result.returncode == 0, result.stderr
         assert b'Seed: 42' in result.stdout
+    # Arrow keys (ESC [ A-D), F2 (ESC O Q) and uppercase letters are
+    # unrecognized: every byte redraws, but only the two waits spend turns
+    # and nothing quits before the final q.
+    ignored = b'\x1b[A\x1b[B\x1b[C\x1b[D\x1bOQWASDQ'
+    result = subprocess.run([str(GAME), '42'], input=b'.' + ignored + b'.q',
+                            capture_output=True, timeout=4)
+    assert result.returncode == 0, result.stderr
+    turns = [int(n) for n in re.findall(rb'Turns: (\d+)', result.stdout)]
+    assert turns == [0, 1] + [1] * len(ignored) + [2], turns
     result = subprocess.run([str(GAME)], input=b'q', capture_output=True, timeout=4)
     assert result.returncode == 0 and b'Seed:' in result.stdout
     result = subprocess.run([str(GAME), '1', '2'], input=b'q', capture_output=True, timeout=4)

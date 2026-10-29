@@ -56,7 +56,10 @@ let render ?(color = false) g =
       (Exit, " | > exit\n");
     ];
   (match Game.outcome g with
-  | Playing -> Buffer.add_string b "Collect 8 points, then enter > to escape.\n"
+  | Playing ->
+      Buffer.add_string b
+        (Printf.sprintf "Collect %d points, then enter > to escape.\n"
+           (Game.required g))
   | Won -> styled "1;92" "^ Escaped! The lambda must flow.\n"
   | Lost -> styled "1;91" "X The sandworm caught you.\n");
   Buffer.contents b
